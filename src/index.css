@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+@theme {
+  --color-main: #ffd9ad;
+  --color-secondary: #625641;
+}
+
+/* 2. Webkit (Chrome, Safari, Edge) internal styling */
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+}
+/* 3. Firefox internal styling */
+input[type="color"]::-moz-color-swatch {
+  border: none;
+}
