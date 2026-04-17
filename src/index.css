@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+* {
+  font-family: "Jua, Arial";
+}
+
 @theme {
   --color-main: #ffd9ad;
   --color-secondary: #625641;
