@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 * {
-  font-family: "Jua, Arial";
+  font-family: "Jua", Arial;
 }
 
 @theme {
