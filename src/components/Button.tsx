@@ -10,7 +10,7 @@ export default function Button({
 }) {
   return (
     <button
-      className={`min-w-40 rounded-md bg-secondary text-main text-xl cursor-pointer hover:brightness-85 transition duration-300 ${className}`}
+      className={`rounded-md bg-secondary text-main text-xl cursor-pointer hover:brightness-85 transition duration-300 ${className}`}
       {...props}
     >
       {children}
