@@ -4,8 +4,7 @@ export default function Button({
   className,
   children,
   ...props
-}: {
-  className?: string;
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
   children: ReactNode;
 }) {
   return (
