@@ -11,8 +11,8 @@ export type Point = {
 export type Stroke = {
   points: Point[];
   color: string;
-  lineWidth: string;
-  userId: string;
+  lineWidth: number;
+  userId?: string;
 };
 
 export type RoomType = {
@@ -20,4 +20,5 @@ export type RoomType = {
   users: User[];
   baseImage: string | null;
   strokes: Stroke[];
+  canvasDimensions: Point;
 };
