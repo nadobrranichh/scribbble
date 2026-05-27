@@ -101,6 +101,10 @@ export default function CanvasSection() {
         roomId,
       });
     });
+
+    return () => {
+      socket.emit("leave-room", roomId);
+    };
   }, []);
 
   useEffect(() => {
