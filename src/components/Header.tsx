@@ -1,6 +1,7 @@
 import ArrowLeftImg from "../assets/arrow-left.svg";
 import { useLocation, useNavigate } from "react-router";
 import { useRoomIdStore } from "../store/room-id-store";
+import { socket } from "../socket/socket";
 
 export default function Header() {
   const { roomId, clearRoomId } = useRoomIdStore();
@@ -12,6 +13,7 @@ export default function Header() {
         {location.pathname !== "/" && (
           <button
             onClick={() => {
+              socket.emit("leave-room", roomId);
               navigate("/");
               clearRoomId();
             }}
