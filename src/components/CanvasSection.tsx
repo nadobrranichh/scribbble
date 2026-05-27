@@ -1,47 +1,80 @@
 import { useEffect, useRef } from "react";
 import { colorsList, widthsList } from "../lists/canvas";
+import { useLocation } from "react-router";
+import type { Location } from "react-router";
+import type { Point, RoomType, Stroke } from "../types/types";
+import { socket } from "../socket/socket";
+import { useRoomIdStore } from "../store/room-id-store";
+import { draw, drawStroke } from "../util/canvas";
 
 export default function CanvasSection() {
+  const { roomId } = useRoomIdStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D>(null);
   const isDrawing = useRef<boolean>(false);
-  const lastPosition = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const lastPosition = useRef<Point>({ x: 0, y: 0 });
+  const currentStroke = useRef<Stroke>(null);
+  const location = useLocation() as Location<RoomType>;
+  const room = location.state;
 
   function setCtxColor(color: string) {
     if (!ctxRef.current) return;
     ctxRef.current.strokeStyle = color;
-    console.log(color, ctxRef.current.strokeStyle);
   }
 
   function handleMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
+    if (!ctxRef.current) return;
     isDrawing.current = true;
-    lastPosition.current = {
+    const startingPosition = {
       x: e.nativeEvent.offsetX,
       y: e.nativeEvent.offsetY,
+    };
+    lastPosition.current = startingPosition;
+    currentStroke.current = {
+      points: [startingPosition],
+      color: ctxRef.current.strokeStyle as string,
+      lineWidth: ctxRef.current.lineWidth,
     };
   }
 
   function handleMouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
     const ctx = ctxRef.current;
-    if (!isDrawing.current || !ctx) return;
-    ctx.beginPath();
-    ctx.moveTo(lastPosition.current.x, lastPosition.current.y);
-    ctx.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
-    ctx.stroke();
-    lastPosition.current = {
+    const curStroke = currentStroke.current;
+    if (!isDrawing.current || !ctx || !curStroke) return;
+    const newPosition = {
       x: e.nativeEvent.offsetX,
       y: e.nativeEvent.offsetY,
-    };
+    } as Point;
+
+    draw(ctx, lastPosition.current, newPosition);
+    curStroke.points.push(newPosition);
+    lastPosition.current = newPosition;
+  }
+
+  function handleStopDrawing() {
+    if (!isDrawing.current) return;
+    isDrawing.current = false;
+    socket.emit("draw", {
+      stroke: { ...currentStroke.current, userId: socket.id || "" },
+      roomId,
+    });
+    currentStroke.current = null;
   }
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) {
-      console.log("no canvas?");
-      return;
+    if (!canvas) return;
+    if (room) {
+      canvas.width = room.canvasDimensions.x;
+      canvas.height = room.canvasDimensions.y;
+    } else {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      socket.emit("set-dimensions", {
+        roomId,
+        dimensions: { x: canvas.width, y: canvas.height },
+      });
     }
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
 
     ctxRef.current = canvas.getContext("2d");
     const ctx = ctxRef.current;
@@ -50,17 +83,60 @@ export default function CanvasSection() {
     ctx.lineWidth = 2.5;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+
+    //reacting to other users' drawings
+    socket.on("drawn", (data: { stroke: Stroke }) => {
+      const { stroke } = data;
+      drawStroke(ctx, stroke);
+    });
+
+    socket.on("request-snapshot", () => {
+      console.log(
+        "SENDING A SNAPSHOT TO BACKEND:",
+        canvasRef.current?.toDataURL(),
+        roomId,
+      );
+      socket.emit("snapshot", {
+        image: canvasRef.current?.toDataURL(),
+        roomId,
+      });
+    });
+
+    return () => {
+      socket.emit("leave-room", roomId);
+    };
   }, []);
 
+  useEffect(() => {
+    // for late room joiners: drawing base image and strokes
+    const ctx = ctxRef.current;
+
+    if (!room || !ctx) return;
+    if (room.baseImage) {
+      const img = new Image();
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0);
+        room.strokes.forEach((s) => drawStroke(ctx, s));
+      };
+      img.src = room.baseImage;
+    } else room.strokes.forEach((s) => drawStroke(ctx, s));
+  }, []);
+
+  const dimensions = room
+    ? { height: room.canvasDimensions.y, width: room.canvasDimensions.x }
+    : { height: "100%", width: "100%" };
+
+  console.log("SETTING DIMENSIONS AS:", dimensions);
   return (
-    <section className="w-full h-full">
+    <section className="w-full h-full bg-black flex items-center justify-center overflow-auto">
       <canvas
         ref={canvasRef}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
-        onMouseUp={() => (isDrawing.current = false)}
-        onMouseLeave={() => (isDrawing.current = false)}
-        className="bg-main h-full w-full cursor-crosshair"
+        onMouseUp={handleStopDrawing}
+        onMouseLeave={handleStopDrawing}
+        className="bg-main cursor-crosshair"
+        style={dimensions}
       ></canvas>
       <div className="bg-secondary absolute p-3 rounded-lg top-auto bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-3">
         <ul className="list-none flex gap-1.5">
