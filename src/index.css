@@ -7,6 +7,7 @@
 @theme {
   --color-main: #ffd9ad;
   --color-secondary: #625641;
+  --color-error: #c50f05;
 }
 
 /* 2. Webkit (Chrome, Safari, Edge) internal styling */
