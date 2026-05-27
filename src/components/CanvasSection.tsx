@@ -8,6 +8,7 @@ import { useRoomIdStore } from "../store/room-id-store";
 import { draw, drawStroke } from "../util/canvas";
 import { useNameStore } from "../store/name-store";
 import HedgehogAvatar from "../assets/hedgehog.svg";
+import ArrowYImg from "../assets/arrow-y.svg";
 
 export default function CanvasSection() {
   const { roomId } = useRoomIdStore();
@@ -22,6 +23,7 @@ export default function CanvasSection() {
   const [activeUsers, setActiveUsers] = useState<User[]>(
     room?.users ?? [{ name: name }],
   );
+  const [isUsersPanelOpen, setIsUsersPanelOpen] = useState<boolean>(true);
 
   function setCtxColor(color: string) {
     if (!ctxRef.current) return;
@@ -190,16 +192,34 @@ export default function CanvasSection() {
           ))}
         </ul>
       </div>
-      <div className="bg-secondary absolute w-65 right-4 top-5 rounded-lg p-3 flex flex-col gap-2">
-        <p className="text-main text-lg">Active users:</p>
-        {activeUsers.map((u) => (
-          <div className="flex items-center justify-start gap-2">
-            <img src={HedgehogAvatar} className="w-8" />
-            <p className="text-lg text-main leading-none translate-y-0.5">
-              {u.name || u.socketId}
-            </p>
-          </div>
-        ))}
+      <div
+        className="bg-secondary absolute right-2 top-2 rounded-lg p-3 flex flex-col gap-2 min-w-44"
+        style={{
+          transition: "all 0.3s ease",
+          width: isUsersPanelOpen ? "auto" : "11rem",
+        }}
+      >
+        <div className="flex justify-between items-center">
+          <p className="text-main text-lg">Active users:</p>
+          <img
+            src={ArrowYImg}
+            className="w-6 h-6 border border-main rounded-xl cursor-pointer"
+            onClick={() => setIsUsersPanelOpen((prev) => !prev)}
+            style={{
+              transition: "all 0.3s ease",
+              rotate: isUsersPanelOpen ? "0deg" : "180deg",
+            }}
+          />
+        </div>
+        {isUsersPanelOpen &&
+          activeUsers.map((u) => (
+            <div className="flex items-center justify-start gap-2">
+              <img src={HedgehogAvatar} className="w-8" />
+              <p className="text-lg text-main leading-none translate-y-0.5">
+                {u.name || u.socketId}
+              </p>
+            </div>
+          ))}
       </div>
     </section>
   );
