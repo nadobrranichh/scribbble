@@ -1,14 +1,17 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { colorsList, widthsList } from "../lists/canvas";
 import { useLocation } from "react-router";
 import type { Location } from "react-router";
-import type { Point, RoomType, Stroke } from "../types/types";
+import type { Point, RoomType, Stroke, User } from "../types/types";
 import { socket } from "../socket/socket";
 import { useRoomIdStore } from "../store/room-id-store";
 import { draw, drawStroke } from "../util/canvas";
+import { useNameStore } from "../store/name-store";
+import HedgehogAvatar from "../assets/hedgehog.svg";
 
 export default function CanvasSection() {
   const { roomId } = useRoomIdStore();
+  const { name } = useNameStore();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const ctxRef = useRef<CanvasRenderingContext2D>(null);
   const isDrawing = useRef<boolean>(false);
@@ -16,6 +19,9 @@ export default function CanvasSection() {
   const currentStroke = useRef<Stroke>(null);
   const location = useLocation() as Location<RoomType>;
   const room = location.state;
+  const [activeUsers, setActiveUsers] = useState<User[]>(
+    room?.users ?? [{ name: name }],
+  );
 
   function setCtxColor(color: string) {
     if (!ctxRef.current) return;
@@ -84,6 +90,23 @@ export default function CanvasSection() {
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
 
+    //reacting to users joining/leaving
+    const handleNewGuest = (newUser: User) => {
+      setActiveUsers((prev) => {
+        if (prev.some((u) => u.socketId === newUser.socketId)) return prev;
+        return [...prev, newUser];
+      });
+    };
+
+    const handleRoomLeft = (leftUser: User) => {
+      setActiveUsers((prev) =>
+        prev.filter((u) => u.socketId !== leftUser.socketId),
+      );
+    };
+
+    socket.on("new-room-guest", handleNewGuest);
+    socket.on("room-left", handleRoomLeft);
+
     //reacting to other users' drawings
     socket.on("drawn", (data: { stroke: Stroke }) => {
       const { stroke } = data;
@@ -101,10 +124,6 @@ export default function CanvasSection() {
         roomId,
       });
     });
-
-    return () => {
-      socket.emit("leave-room", roomId);
-    };
   }, []);
 
   useEffect(() => {
@@ -170,6 +189,17 @@ export default function CanvasSection() {
             </li>
           ))}
         </ul>
+      </div>
+      <div className="bg-secondary absolute w-65 right-4 top-5 rounded-lg p-3 flex flex-col gap-2">
+        <p className="text-main text-lg">Active users:</p>
+        {activeUsers.map((u) => (
+          <div className="flex items-center justify-start gap-2">
+            <img src={HedgehogAvatar} className="w-8" />
+            <p className="text-lg text-main leading-none translate-y-0.5">
+              {u.name || u.socketId}
+            </p>
+          </div>
+        ))}
       </div>
     </section>
   );
