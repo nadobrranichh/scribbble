@@ -16,7 +16,6 @@ export function draw(
 }
 
 export function drawStroke(ctx: CanvasRenderingContext2D, stroke: Stroke) {
-  console.log(stroke, ctx);
   const { points, color, lineWidth } = stroke;
   points.forEach((_, i) => {
     if (points[i + 1])

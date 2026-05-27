@@ -116,11 +116,6 @@ export default function CanvasSection() {
     });
 
     socket.on("request-snapshot", () => {
-      console.log(
-        "SENDING A SNAPSHOT TO BACKEND:",
-        canvasRef.current?.toDataURL(),
-        roomId,
-      );
       socket.emit("snapshot", {
         image: canvasRef.current?.toDataURL(),
         roomId,
@@ -147,7 +142,6 @@ export default function CanvasSection() {
     ? { height: room.canvasDimensions.y, width: room.canvasDimensions.x }
     : { height: "100%", width: "100%" };
 
-  console.log("SETTING DIMENSIONS AS:", dimensions);
   return (
     <section className="w-full h-full bg-black flex items-center justify-center overflow-auto">
       <canvas
