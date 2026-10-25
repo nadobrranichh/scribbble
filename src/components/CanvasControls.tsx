@@ -1,5 +1,6 @@
 import { useRef, useState, type RefObject } from "react";
 import { colorsList, widthsList } from "../lists/canvas";
+import EraserImg from "../assets/eraser.svg";
 
 export default function CanvasControls({
   ctxRef,
@@ -49,6 +50,12 @@ export default function CanvasControls({
         </li>
       </ul>
       <ul className="flex gap-1.5">
+        <li
+          className={`w-6 h-6 rounded-full bg-[rgba(255,255,255,0.3)] border border-amber-50 flex justify-center items-center ${currentValues.strokeStyle === "#ffd9ad" ? "border-3 " : ""}`}
+          onClick={() => setCtxColor("#ffd9ad")}
+        >
+          <img src={EraserImg} className="h-4 w-4" />
+        </li>
         {widthsList.map((w) => (
           <li
             key={w.label}
