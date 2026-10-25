@@ -16,6 +16,8 @@ export function draw(
 }
 
 export function drawStroke(ctx: CanvasRenderingContext2D, stroke: Stroke) {
+  const userStyle = ctx.strokeStyle;
+  const userLineWidth = ctx.lineWidth;
   const { points, color, lineWidth } = stroke;
   points.forEach((_, i) => {
     if (points[i + 1])
@@ -23,4 +25,6 @@ export function drawStroke(ctx: CanvasRenderingContext2D, stroke: Stroke) {
         ? draw(ctx, points[i], points[i + 1], color, lineWidth)
         : draw(ctx, points[i], points[i + 1]);
   });
+  ctx.strokeStyle = userStyle;
+  ctx.lineWidth = userLineWidth;
 }
