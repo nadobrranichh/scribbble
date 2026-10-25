@@ -1,5 +1,5 @@
 import ArrowLeftImg from "../assets/arrow-left.svg";
-import { useLocation, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { useRoomIdStore } from "../store/room-id-store";
 import { socket } from "../socket/socket";
 
@@ -8,8 +8,8 @@ export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   return (
-    <header className="h-20 bg-secondary px-8 flex items-center justify-between ">
-      <p className="text-main text-3xl flex items-center gap-5">
+    <header className="h-20 bg-secondary px-4 lg:px-8 flex items-center justify-between ">
+      <p className="text-main text-3xl flex items-center gap-4 lg:gap-8">
         {location.pathname !== "/" && (
           <button
             onClick={() => {
@@ -18,12 +18,16 @@ export default function Header() {
               clearRoomId();
             }}
           >
-            <img className="w-8 cursor-pointer" src={ArrowLeftImg} />
+            <img className="w-8 h-8 cursor-pointer" src={ArrowLeftImg} />
           </button>
         )}
-        Scribbble
+        <Link to="/">Scribbble</Link>
       </p>
-      {roomId && <p className="text-main">Room ID: {roomId}</p>}
+      {roomId && (
+        <p className="text-main text-end">
+          Room ID: <br /> {roomId}
+        </p>
+      )}
     </header>
   );
 }
