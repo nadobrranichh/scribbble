@@ -7,6 +7,8 @@ import Room from "../components/Room";
 import { socket } from "../socket/socket";
 import { useRoomIdStore } from "../store/room-id-store";
 import { useNavigate } from "react-router";
+import { AnimatePresence, motion } from "motion/react";
+import { fade, hoverScale, tapScale } from "../motion";
 
 export default function JoinPage() {
   const navigate = useNavigate();
@@ -15,6 +17,7 @@ export default function JoinPage() {
   const { setRoomId } = useRoomIdStore();
 
   async function handleSearch() {
+    console.log("sSEARCRUHGGNNG!!");
     const rooms = await fetchRoomsById(roomIdRef.current?.value || "");
     setFoundRooms(rooms);
   }
@@ -27,10 +30,23 @@ export default function JoinPage() {
   }, [socket]);
 
   return (
-    <main className="flex-1 flex flex-col items-center bg-main gap-3">
-      <div className="py-10">
-        <p className="text-secondary text-center text-xl">Enter Room ID:</p>
-        <input
+    <main className="flex-1 flex flex-col items-center bg-main gap-4">
+      <motion.div
+        variants={fade({ withStagger: true })}
+        initial="hidden"
+        animate="visible"
+        className="py-10"
+      >
+        <motion.p
+          variants={fade()}
+          className="text-secondary text-center text-xl"
+        >
+          Enter Room ID:
+        </motion.p>
+        <motion.input
+          whileHover={hoverScale}
+          whileTap={tapScale}
+          variants={fade()}
           ref={roomIdRef}
           name="room-id"
           type="text"
@@ -40,11 +56,21 @@ export default function JoinPage() {
         <Button className="ml-1 p-3" onClick={handleSearch}>
           <img src={SearchIcon} className="w-4" />
         </Button>
-      </div>
-      {foundRooms &&
-        foundRooms.map((r) => (
-          <Room key={r.id} id={r.id} users={r.users.length} />
-        ))}
+      </motion.div>
+      <AnimatePresence mode="wait">
+        <motion.div
+          variants={fade({ withStagger: true })}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          className="flex flex-col gap-4"
+        >
+          {foundRooms &&
+            foundRooms.map((r) => (
+              <Room key={r.id} id={r.id} users={r.users.length} />
+            ))}
+        </motion.div>
+      </AnimatePresence>
     </main>
   );
 }
