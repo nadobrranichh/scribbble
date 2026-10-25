@@ -17,7 +17,6 @@ export default function JoinPage() {
   const { setRoomId } = useRoomIdStore();
 
   async function handleSearch() {
-    console.log("sSEARCRUHGGNNG!!");
     const rooms = await fetchRoomsById(roomIdRef.current?.value || "");
     setFoundRooms(rooms);
   }
