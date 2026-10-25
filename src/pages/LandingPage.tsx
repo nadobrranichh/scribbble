@@ -4,6 +4,8 @@ import { socket } from "../socket/socket";
 import { useEffect, useState } from "react";
 import { useRoomIdStore } from "../store/room-id-store";
 import { useNameStore } from "../store/name-store";
+import { motion } from "motion/react";
+import { fade } from "../motion";
 
 const NAME_MAX_LENGTH = 20;
 
@@ -37,38 +39,49 @@ export default function LandingPage() {
     action();
   }
   return (
-    <main className="flex-1 bg-main text-secondary flex flex-col items-center justify-center gap-4">
-      <h2 className="text-5xl font-bold">Scribbble</h2>
-      <div>
-        {isNameError ? (
-          <p className="text-xl text-error text-center">
-            Please enter your name first:
-          </p>
-        ) : (
-          <p className="text-2xl text-center">Enter your name:</p>
-        )}
-        <input
-          value={enteredName}
-          onChange={(e) => setEnteredName(e.target.value)}
-          className="border-2 border-secondary rounded-md text-xl h-10 align-top text-center w-70 text-secondary"
-          maxLength={NAME_MAX_LENGTH}
-        />
-      </div>
-      <div>
-        <Button
-          className="min-w-40 px-4 py-2 block  my-2"
-          onClick={() => checkNameAndExecute(() => navigate("join"))}
-        >
-          Join a room
-        </Button>
+    <main className="flex-1 bg-main text-secondary flex items-center justify-center">
+      <motion.div
+        variants={fade({ withStagger: true })}
+        initial="hidden"
+        animate="visible"
+        className="flex flex-col items-center justify-center gap-4"
+      >
+        <motion.h2 variants={fade()} className="text-5xl font-bold">
+          Scribbble
+        </motion.h2>
+        <motion.div variants={fade()}>
+          {isNameError ? (
+            <p className="text-xl text-error text-center">
+              Please enter your name first:
+            </p>
+          ) : (
+            <p className="text-2xl text-center">Enter your name:</p>
+          )}
+          <input
+            value={enteredName}
+            onChange={(e) => setEnteredName(e.target.value)}
+            className="border-2 border-secondary rounded-md text-xl h-10 align-top text-center w-70 text-secondary"
+            maxLength={NAME_MAX_LENGTH}
+          />
+        </motion.div>
+        <div>
+          <Button
+            className="min-w-40 px-4 py-2 block  my-2"
+            onClick={() => checkNameAndExecute(() => navigate("join"))}
+          >
+            Join a room
+          </Button>
 
-        <Button
-          className="min-w-40 px-4 py-2 block my-2"
-          onClick={() => checkNameAndExecute(() => socket.emit("create-room"))}
-        >
-          Create a room
-        </Button>
-      </div>
+          <Button
+            className="min-w-40 px-4 py-2 block my-2"
+            onClick={() =>
+              checkNameAndExecute(() => socket.emit("create-room"))
+            }
+          >
+            Create a room
+          </Button>
+        </div>
+      </motion.div>
     </main>
   );
 }
