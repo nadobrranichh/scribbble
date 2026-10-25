@@ -1,6 +1,8 @@
 import { useRef, useState, type RefObject } from "react";
 import { colorsList, widthsList } from "../lists/canvas";
 import EraserImg from "../assets/eraser.svg";
+import { motion } from "motion/react";
+import { fade, hoverScale, tapScale } from "../motion";
 
 export default function CanvasControls({
   ctxRef,
@@ -26,19 +28,28 @@ export default function CanvasControls({
   }
 
   return (
-    <div className="bg-secondary absolute p-3 rounded-lg top-auto bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3">
+    <motion.div
+      variants={fade()}
+      initial="hidden"
+      animate="visible"
+      className="bg-secondary absolute p-3 rounded-lg top-auto bottom-2 lg:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3"
+    >
       <ul className="list-none flex gap-1.5">
         {colorsList.map((color) => (
-          <li
+          <motion.li
+            whileHover={hoverScale}
+            whileTap={tapScale}
             key={color.key}
             className={`${color.bg} w-6 h-6 rounded-full border border-amber-50 cursor-pointer ${currentValues.strokeStyle === color.hex ? "border-3" : ""}`}
             onClick={() => setCtxColor(color.hex)}
-          ></li>
+          ></motion.li>
         ))}
         <li
           className={`w-6 h-6 rounded-full border border-amber-50 ${currentValues.strokeStyle === colorInputRef.current?.value ? "border-3" : ""} `}
         >
-          <input
+          <motion.input
+            whileHover={hoverScale}
+            whileTap={tapScale}
             ref={colorInputRef}
             type="color"
             className="cursor-pointer w-full h-full rounded-full"
@@ -50,22 +61,26 @@ export default function CanvasControls({
         </li>
       </ul>
       <ul className="flex gap-1.5">
-        <li
+        <motion.li
+          whileHover={hoverScale}
+          whileTap={tapScale}
           className={`w-6 h-6 rounded-full bg-[rgba(255,255,255,0.3)] border border-amber-50 flex justify-center items-center ${currentValues.strokeStyle === "#ffd9ad" ? "border-3 " : ""}`}
           onClick={() => setCtxColor("#ffd9ad")}
         >
           <img src={EraserImg} className="h-4 w-4" />
-        </li>
+        </motion.li>
         {widthsList.map((w) => (
-          <li
+          <motion.li
+            whileHover={hoverScale}
+            whileTap={tapScale}
             key={w.label}
             className={`w-6 h-6 bg-[rgba(255,255,255,0.3)] rounded-full border border-amber-50 cursor-pointer flex justify-center items-center ${currentValues.lineWidth === w.value ? "border-3" : ""}`}
             onClick={() => setCtxWidth(w.value)}
           >
             <p className="text-center m-0 text-white">{w.label}</p>
-          </li>
+          </motion.li>
         ))}
       </ul>
-    </div>
+    </motion.div>
   );
 }

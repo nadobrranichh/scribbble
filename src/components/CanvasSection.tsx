@@ -7,6 +7,8 @@ import { useNameStore } from "../store/name-store";
 import HedgehogAvatar from "../assets/hedgehog.svg";
 import ArrowYImg from "../assets/arrow-y.svg";
 import Canvas from "./Canvas";
+import { motion } from "motion/react";
+import { fade } from "../motion";
 
 export default function CanvasSection() {
   const { name } = useNameStore();
@@ -39,8 +41,11 @@ export default function CanvasSection() {
   return (
     <section className="w-full h-full bg-black flex items-center justify-center overflow-auto">
       <Canvas />
-      <div
-        className="bg-secondary absolute right-2 top-2 rounded-lg p-3 flex flex-col gap-2 min-w-44"
+      <motion.div
+        variants={fade()}
+        initial="hidden"
+        animate="visible"
+        className="bg-secondary absolute right-4 top-4 rounded-lg p-3 flex flex-col gap-2 min-w-44"
         style={{
           transition: "all 0.3s ease",
           width: isUsersPanelOpen ? "auto" : "11rem",
@@ -67,7 +72,7 @@ export default function CanvasSection() {
               </p>
             </div>
           ))}
-      </div>
+      </motion.div>
     </section>
   );
 }
