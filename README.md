@@ -1,73 +1,64 @@
-# React + TypeScript + Vite
+## 📋 Scribbble
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A Paint-inspired collaborative drawing web application that allows multiple users to draw together on a shared canvas in real time. Users can create drawings, interact with other participants, and watch their contributions appear instantly.
 
-Currently, two official plugins are available:
+## ⚒️ Technologies
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+> #### Front-End: React, TypeScript, React Router, Axios, Socket.IO, Zustand, (Framer) Motion, TailwindCSS, Vite
 
-## React Compiler
+> #### Back-End: Node.js, TypeScript, Express, Socket.IO
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 💫 Functionality
 
-## Expanding the ESLint configuration
+- **User identification:** Enter a display name upon visiting the application
+- **Room Management**: Create a new drawing room or search for and join an existing one
+- **Interactive Drawing**: Draw freely using different colors and brush sizes
+- **Real-Time Collaboration:** Draw together with other participants in the same room.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🤸 Running the Project
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. Make sure you have Node.js installed on your system;
+2. Clone the <a href="https://github.com/nadobrranichh/scribbble-backend">backend</a> repository;
+3. In the directory of the backend repository, create a `.env` file and add this key:
+   ```env
+   FRONTEND_URL="http://localhost:5173"
+   PORT=3000
+   ```
+   Adjust PORT to the port you'd like;
+4. Open a terminal in the backend directory and run these commands:
+   ```bash
+   npm install                 # installs npm dependencies
+   npm run build               # prepares the project for startup
+   npm run dev                 # starts the backend on http://localhost:PORT
+   ```
+   Don't close the terminal;
+5. Clone the <a href="https://github.com/nadobrranichh/scribbble">frontend</a> repository;
+6. In the directory of the frontend repository, create a `.env` file and add this key:
+   ```env
+   VITE_BACKEND_URL=http://localhost:[PORT]
+   ```
+   Instead of `[PORT]`, set the port value from your backend `.env`;
+7. Open a terminal in the frontend directory and run these commands:
+   ```bash
+   npm install                 # installs npm dependencies
+   npm run dev                 # starts the frontend on http://localhost:5173
+   ```
+8. Visit `http://localhost:5173` in your browser.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Preview
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### Mobile:
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+<p style="display: flex; gap: 1rem">
+  <img src="./images/landing-mobile.jpg" alt="Landing Mobile" width="25%">
+  <img src="./images/join-mobile.jpg" alt="Join Mobile" width="25%">
+  <img src="./images/room-mobile.jpg" alt="Room Mobile" width="25%">
+</p>
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Desktop:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+<p style="display: flex; flex-direction: column; gap: 1rem">
+  <img src="./images/landing.png" alt="Landing Desktop" width="70%">
+  <img src="./images/join.png" alt="Join Desktop" width="70%">
+  <img src="./images/room.png" alt="Room Desktop" width="70%">
+</p>
