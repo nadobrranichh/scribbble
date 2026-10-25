@@ -4,8 +4,9 @@ import { socket } from "../socket/socket";
 import { useEffect, useState } from "react";
 import { useRoomIdStore } from "../store/room-id-store";
 import { useNameStore } from "../store/name-store";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { fade } from "../motion";
+import LoadingBlock from "../components/LoadingBlock";
 
 const NAME_MAX_LENGTH = 20;
 
@@ -13,19 +14,25 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const { roomId, setRoomId, clearRoomId } = useRoomIdStore();
   const { name, setName } = useNameStore();
-  const [isNameError, setIsNameError] = useState<boolean>(false);
-
-  const [enteredName, setEnteredName] = useState<string>("");
+  const [isNameError, setIsNameError] = useState(false);
+  const [loadingText, setLoadingText] = useState("");
+  const [enteredName, setEnteredName] = useState("");
 
   useEffect(() => {
     if (roomId) {
       socket.emit("leave-room", roomId);
       clearRoomId();
     }
-    socket.on("room-created", (newRoomId) => {
+    function handleRoomCreated(newRoomId: string) {
+      setLoadingText("");
       setRoomId(newRoomId);
       navigate(`/room?id=${newRoomId}`);
-    });
+    }
+    socket.on("room-created", handleRoomCreated);
+
+    return () => {
+      socket.off("room-created", handleRoomCreated);
+    };
   }, [socket]);
 
   useEffect(() => {
@@ -35,6 +42,7 @@ export default function LandingPage() {
   function checkNameAndExecute(action: () => void) {
     if (!enteredName.trim()) {
       setIsNameError(true);
+      setLoadingText("");
       return;
     }
 
@@ -72,19 +80,25 @@ export default function LandingPage() {
           <Button
             className="min-w-40 px-4 py-2 block  my-2"
             onClick={() => checkNameAndExecute(() => navigate("join"))}
+            disabled={!!loadingText.length}
           >
             Join a room
           </Button>
 
           <Button
             className="min-w-40 px-4 py-2 block my-2"
-            onClick={() =>
-              checkNameAndExecute(() => socket.emit("create-room"))
-            }
+            onClick={() => {
+              setLoadingText("Creating a room for you");
+              checkNameAndExecute(() => socket.emit("create-room"));
+            }}
+            disabled={!!loadingText.length}
           >
             Create a room
           </Button>
         </div>
+        <AnimatePresence>
+          {loadingText.length > 0 && <LoadingBlock label={loadingText} />}
+        </AnimatePresence>
       </motion.div>
     </main>
   );

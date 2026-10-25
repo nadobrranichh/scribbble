@@ -9,16 +9,20 @@ import { useRoomIdStore } from "../store/room-id-store";
 import { useNavigate } from "react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { fade, hoverScale, tapScale } from "../motion";
+import LoadingBlock from "../components/LoadingBlock";
 
 export default function JoinPage() {
   const navigate = useNavigate();
   const roomIdRef = useRef<HTMLInputElement>(null);
+  const [loadingText, setLoadingText] = useState("");
   const [foundRooms, setFoundRooms] = useState<RoomType[]>([]);
   const { setRoomId } = useRoomIdStore();
 
   async function handleSearch() {
+    setLoadingText("Searching for rooms");
     const rooms = await fetchRoomsById(roomIdRef.current?.value || "");
     setFoundRooms(rooms);
+    setLoadingText("");
   }
 
   useEffect(() => {
@@ -69,6 +73,9 @@ export default function JoinPage() {
               <Room key={r.id} id={r.id} users={r.users.length} />
             ))}
         </motion.div>
+      </AnimatePresence>
+      <AnimatePresence>
+        {loadingText.length > 0 && <LoadingBlock label={loadingText} />}
       </AnimatePresence>
     </main>
   );

@@ -1,5 +1,7 @@
 import SpinnerIcon from "../assets/spinner.svg";
 import { useEffect, useState } from "react";
+import { motion } from "motion/react";
+import { fade } from "../motion";
 
 export default function LoadingBlock({ label = "Loading" }: { label: string }) {
   const [ellipsis, setEllipsis] = useState<string>(".");
@@ -14,7 +16,13 @@ export default function LoadingBlock({ label = "Loading" }: { label: string }) {
   }, []);
 
   return (
-    <div className="text-center flex flex-col justify-center gap-1.5">
+    <motion.div
+      variants={fade()}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      className="text-center flex flex-col justify-center gap-1.5 bg-main p-5 rounded-lg border-2 border-secondary"
+    >
       <img
         src={SpinnerIcon}
         alt=""
@@ -24,6 +32,6 @@ export default function LoadingBlock({ label = "Loading" }: { label: string }) {
         {label}
         {ellipsis}
       </p>
-    </div>
+    </motion.div>
   );
 }
