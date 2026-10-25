@@ -11,13 +11,17 @@ const NAME_MAX_LENGTH = 20;
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { setRoomId } = useRoomIdStore();
+  const { roomId, setRoomId, clearRoomId } = useRoomIdStore();
   const { name, setName } = useNameStore();
   const [isNameError, setIsNameError] = useState<boolean>(false);
 
   const [enteredName, setEnteredName] = useState<string>("");
 
   useEffect(() => {
+    if (roomId) {
+      socket.emit("leave-room", roomId);
+      clearRoomId();
+    }
     socket.on("room-created", (newRoomId) => {
       setRoomId(newRoomId);
       navigate(`/room?id=${newRoomId}`);
